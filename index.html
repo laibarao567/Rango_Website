@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Rango — handmade resin jewelry & accessories with real pressed flowers.">
+<title>Rango — Handmade Resin Jewelry</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Great+Vibes&family=Playfair+Display:ital,wght@0,500;0,600;1,500;1,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="topbar">Handcrafted with love ✦ Free delivery on orders over Rs. 3,000</div>
+
+<header class="header">
+  <a href="#home" class="logo">Rango</a>
+  <nav>
+    <a class="active" href="#shop">SHOP</a>
+    <a href="#about">ABOUT</a>
+    <a href="#contact">CONTACT</a>
+  </nav>
+  <button class="bag-btn" id="cartBtn" aria-label="Shopping bag">♡ <span id="cartCount">0</span></button>
+  <button class="hamburger" id="menuBtn">☰</button>
+</header>
+
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#shop">SHOP</a><a href="#about">ABOUT</a><a href="#contact">CONTACT</a>
+</div>
+
+<main id="home">
+<section class="hero">
+  <div class="hero-copy">
+    <p class="small-label">HANDMADE • ONE OF A KIND</p>
+    <h1>Nature, captured<br>in <i>little treasures.</i></h1>
+    <p>Delicate resin jewelry and accessories, made by hand with real pressed flowers, soft colors and a little sparkle.</p>
+    <a class="hero-btn" href="#shop">Explore the collection <span>→</span></a>
+  </div>
+  <div class="hero-gallery">
+    <div class="hero-main"><img src="images/84abb8238907f78d913f58f4db1b680b.jpg" alt="Rango lavender floral earrings"></div>
+    <div class="hero-small"><img src="images/e7d05f88b9de1fa7a50ac1fa7bf34c21.jpg" alt="Rango botanical pendant"></div>
+    <div class="hero-note">real flowers<br>forever ✿</div>
+  </div>
+</section>
+
+<section class="collection" id="shop">
+  <div class="collection-head">
+    <div>
+      <p class="small-label">THE COLLECTION</p>
+      <h2>Our Collection</h2>
+      <p class="italic-sub">Handcrafted pieces, each capturing a unique moment in nature</p>
+    </div>
+    <select id="sortSelect">
+      <option value="featured">Sort by: Featured</option>
+      <option value="low">Price: Low to High</option>
+      <option value="high">Price: High to Low</option>
+      <option value="name">Name A–Z</option>
+    </select>
+  </div>
+
+  <div class="filters" id="filters">
+    <button class="filter active" data-cat="All">All</button>
+    <button class="filter" data-cat="Rings">Rings</button>
+    <button class="filter" data-cat="Earrings">Earrings</button>
+    <button class="filter" data-cat="Necklaces">Necklaces</button>
+    <button class="filter" data-cat="Bracelets">Bracelets</button>
+    <button class="filter" data-cat="Keychains">Keychains</button>
+    <button class="filter" data-cat="Accessories">Accessories</button>
+  </div>
+
+  <div class="search-line">
+    <input id="searchInput" type="search" placeholder="Search your little treasure…">
+  </div>
+  <div class="products" id="products"></div>
+</section>
+
+<section class="story" id="about">
+  <div class="story-image"><img src="images/d582c409b11379012bd4f62ed843c709.jpg" alt="Rango floral bracelet"></div>
+  <div class="story-copy">
+    <p class="small-label">A LITTLE ABOUT RANGO</p>
+    <h2>Made slowly.<br><i>Meant to be kept.</i></h2>
+    <p>Rango began with a love for tiny things that feel special. We preserve real flowers inside clear resin and turn them into wearable keepsakes.</p>
+    <p>Every piece is handmade in small batches, so little differences are part of its charm — no two pieces are ever exactly alike.</p>
+    <a href="#contact" class="under-link">Get to know us →</a>
+  </div>
+</section>
+
+<section class="promise">
+  <div><span>✿</span><strong>Real botanicals</strong><p>Pressed flowers & leaves</p></div>
+  <div><span>♡</span><strong>Made by hand</strong><p>Small-batch craftsmanship</p></div>
+  <div><span>✦</span><strong>Gift ready</strong><p>Beautifully packed with care</p></div>
+  <div><span>∞</span><strong>One of a kind</strong><p>Every piece is unique</p></div>
+</section>
+
+<section class="custom">
+  <div>
+    <p class="small-label">MAKE IT PERSONAL</p>
+    <h2>Have a flower or idea<br>you want to <i>keep forever?</i></h2>
+    <p>Tell us what you have in mind and we'll create a special piece around it.</p>
+  </div>
+  <button class="outline-light" id="customBtn">Request a custom piece →</button>
+</section>
+
+<section class="contact" id="contact">
+  <p class="small-label">LET'S BE FRIENDS</p>
+  <h2>Stay close to Rango.</h2>
+  <p>New drops, pretty pieces and little surprises — straight to your inbox.</p>
+  <form id="newsletter">
+    <input type="email" id="email" placeholder="Your email address" required>
+    <button type="submit">Join us ♡</button>
+  </form>
+  <div class="contact-info"><span>Instagram · @rango.handmade</span><span>Email · hello@rango-handmade.com</span></div>
+</section>
+</main>
+
+<footer><div class="footer-logo">Rango</div><p>© 2026 Rango · Handmade treasures inspired by nature.</p><div><a href="#shop">Shop</a> · <a href="#about">About</a> · <a href="#contact">Contact</a></div></footer>
+
+<aside class="drawer" id="drawer">
+  <div class="drawer-head"><div><p class="small-label">YOUR BAG</p><h2>Little treasures</h2></div><button id="closeCart">×</button></div>
+  <div class="cart-items" id="cartItems"></div>
+  <div class="empty" id="emptyCart">Your bag is empty ♡<br><a href="#shop">Find a little treasure</a></div>
+  <div class="cart-footer" id="cartFooter">
+    <div><span>Subtotal</span><strong id="subtotal">Rs. 0</strong></div>
+    <small>Demo checkout — no real payment is processed.</small>
+    <button class="dark-btn" id="checkoutBtn">Checkout →</button>
+  </div>
+</aside>
+<div class="backdrop" id="backdrop"></div>
+
+<div class="modal" id="productModal">
+  <div class="modal-box product-box"><button class="x" data-close="productModal">×</button><div id="productDetail"></div></div>
+</div>
+
+<div class="modal" id="checkoutModal">
+  <div class="modal-box form-box"><button class="x" data-close="checkoutModal">×</button>
+    <p class="small-label">CHECKOUT</p><h2>Complete your order</h2>
+    <form id="checkoutForm">
+      <div class="two"><label>Name<input name="name" required></label><label>Phone<input name="phone" required></label></div>
+      <label>Email<input type="email" name="email" required></label>
+      <label>Address<textarea name="address" rows="3" required></textarea></label>
+      <label>City<input name="city" required></label>
+      <label>Payment<select name="payment"><option>Cash on Delivery</option><option>Bank Transfer</option></select></label>
+      <div id="checkoutSummary" class="summary"></div>
+      <button class="dark-btn" type="submit">Place order ♡</button>
+    </form>
+  </div>
+</div>
+
+<div class="modal" id="customModal">
+  <div class="modal-box form-box"><button class="x" data-close="customModal">×</button>
+    <p class="small-label">CUSTOM ORDER</p><h2>Your idea, your piece.</h2>
+    <form id="customForm">
+      <label>Name<input name="name" required></label>
+      <label>Phone / WhatsApp<input name="phone" required></label>
+      <label>Tell us your idea<textarea name="idea" rows="5" placeholder="Flower, color, shape, occasion…" required></textarea></label>
+      <button class="dark-btn" type="submit">Send request →</button>
+    </form>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="script.js"></script>
+</body>
+</html>
