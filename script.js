@@ -10,64 +10,37 @@ const products=[
 {id:9,name:"Pink Blossom Studs",cat:"Earrings",price:1650,badge:"New",img:"images/9de87458f925ee48c10f053b0a88ee43.jpg",desc:"Sweet pink floral studs for a soft everyday look."},
 {id:10,name:"Green Leaf Earrings",cat:"Earrings",price:1850,badge:"",img:"images/b21cbee6e35acb3c3abd101889e460a5.jpg",desc:"Fresh green leaf-shaped earrings inspired by nature."},
 {id:11,name:"Rose Garden Bracelet",cat:"Bracelets",price:2250,badge:"Bestseller",img:"images/d582c409b11379012bd4f62ed843c709.jpg",desc:"A romantic pink floral-bead bracelet with a delicate gold chain."},
-{id:12,name:"Daisy Oval Pendant",cat:"Necklaces",price:2100,badge:"New",img:"images/e7d05f88b9de1fa7a50ac1fa7bf34c21.jpg",desc:"A botanical oval pendant with a tiny daisy preserved inside."},
+{id:12,name:"Daisy Oval Pendant",cat:"Necklaces",price:2100,badge:"New",img:"images/e7d05f88b9de1fa7a50ac1fa7bf34c21.jpg",desc:"A botanical oval pendant with a tiny daisy preserved inside."}
 ];
 let cart=JSON.parse(localStorage.getItem("rangoCart2")||"[]"),wish=JSON.parse(localStorage.getItem("rangoWish2")||"[]"),cat="All",current=null;
-
-const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)], money=n=>"Rs. "+n.toLocaleString("en-PK");
-
-function render(){
- let q=$("#searchInput").value.toLowerCase().trim(), list=products.filter(p=>(cat==="All"||p.cat===cat)&&`${p.name} ${p.cat} ${p.desc}`.toLowerCase().includes(q));
- let sort=$("#sortSelect").value;
- if(sort==="low")list.sort((a,b)=>a.price-b.price);
- if(sort==="high")list.sort((a,b)=>b.price-a.price);
- if(sort==="name")list.sort((a,b)=>a.name.localeCompare(b.name));
- $("#products").innerHTML=list.length?list.map(p=>`
- <article class="product-card">
-  <div class="photo" onclick="openProduct(${p.id})">
-   ${p.badge?`<span class="tag">${p.badge}</span>`:""}
-   <button class="heart ${wish.includes(p.id)?"loved":""}" onclick="event.stopPropagation();toggleWish(${p.id})">${wish.includes(p.id)?"♥":"♡"}</button>
-   <img src="${p.img}" alt="${p.name}" loading="lazy">
-   <button class="quick" onclick="event.stopPropagation();addCart(${p.id})">Add to bag</button>
-  </div>
-  <div class="card-info"><div><h3>${p.name}</h3><p>${p.cat}</p></div><span class="price">${money(p.price)}</span></div>
- </article>`).join(""):`<div class="no-results"><h3>No little treasure found.</h3><p>Try another category or search.</p></div>`;
- updateCount();
-}
-function updateCount(){$("#cartCount").textContent=cart.reduce((a,b)=>a+b.qty,0)}
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],money=n=>"Rs. "+n.toLocaleString("en-PK");
+const api=async(action,data)=>{if(!window.RANGO_PHP)return null;try{const r=await fetch(`api.php?action=${action}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)});return await r.json()}catch(e){return null}};
+function render(){let q=$("#searchInput").value.toLowerCase().trim(),list=products.filter(p=>(cat==="All"||p.cat===cat)&&`${p.name} ${p.cat} ${p.desc}`.toLowerCase().includes(q));let sort=$("#sortSelect").value;if(sort==="low")list.sort((a,b)=>a.price-b.price);if(sort==="high")list.sort((a,b)=>b.price-a.price);if(sort==="name")list.sort((a,b)=>a.name.localeCompare(b.name));$("#resultCount").textContent=list.length;$("#products").innerHTML=list.length?list.map(p=>`<article class="product-card"><div class="photo" onclick="openProduct(${p.id})">${p.badge?`<span class="tag">${p.badge}</span>`:""}<button class="heart ${wish.includes(p.id)?"loved":""}" onclick="event.stopPropagation();toggleWish(${p.id})">${wish.includes(p.id)?"♥":"♡"}</button><img src="${p.img}" alt="${p.name}" loading="lazy"><button class="quick" onclick="event.stopPropagation();addCart(${p.id})">Quick add +</button></div><div class="card-info"><div><h3>${p.name}</h3><p>${p.cat}</p></div><span class="price">${money(p.price)}</span></div></article>`).join(""):`<div class="no-results"><h3>No little treasure found.</h3><p>Try another category or search.</p></div>`;updateCount();}
+function updateCount(){const n=cart.reduce((a,b)=>a+b.qty,0);$("#cartCount").textContent=n}
 function save(){localStorage.setItem("rangoCart2",JSON.stringify(cart));localStorage.setItem("rangoWish2",JSON.stringify(wish));updateCount()}
-function addCart(id,qty=1){let x=cart.find(i=>i.id===id);x?x.qty+=qty:cart.push({id,qty});save();renderCart();toast("Added to your bag ♡")}
+function addCart(id,qty=1){let x=cart.find(i=>i.id===id);x?x.qty+=qty:cart.push({id,qty});save();renderCart();toast("Added to your bag ♡");animateBag()}
+function animateBag(){$("#cartBtn").animate([{transform:"scale(1)"},{transform:"scale(1.25)"},{transform:"scale(1)"}],{duration:420,easing:"ease-out"})}
 function changeQty(id,d){let x=cart.find(i=>i.id===id);if(!x)return;x.qty+=d;if(x.qty<1)cart=cart.filter(i=>i.id!==id);save();renderCart()}
 function removeItem(id){cart=cart.filter(i=>i.id!==id);save();renderCart()}
 function toggleWish(id){wish.includes(id)?wish=wish.filter(x=>x!==id):wish.push(id);save();render();toast(wish.includes(id)?"Saved to your wishlist ♡":"Removed from wishlist")}
-function renderCart(){
- if(!cart.length){$("#cartItems").innerHTML="";$("#emptyCart").style.display="block";$("#cartFooter").style.display="none";return}
- $("#emptyCart").style.display="none";$("#cartFooter").style.display="block";let total=0;
- $("#cartItems").innerHTML=cart.map(i=>{let p=products.find(x=>x.id===i.id);total+=p.price*i.qty;return `<div class="cart-row"><div class="cart-img"><img src="${p.img}" alt=""></div><div><h4>${p.name}</h4><small>${money(p.price)}</small><div class="controls"><button onclick="changeQty(${p.id},-1)">−</button><span>${i.qty}</span><button onclick="changeQty(${p.id},1)">+</button><button class="remove" onclick="removeItem(${p.id})">Remove</button></div></div><strong>${money(p.price*i.qty)}</strong></div>`}).join("");
- $("#subtotal").textContent=money(total)
-}
-function openCart(){renderCart();$("#drawer").classList.add("open");$("#backdrop").classList.add("open")}
-function closeCart(){$("#drawer").classList.remove("open");$("#backdrop").classList.remove("open")}
-function openModal(id){$("#"+id).classList.add("open")}
-function closeModal(id){$("#"+id).classList.remove("open")}
-function openProduct(id){let p=products.find(x=>x.id===id);current=p;$("#productDetail").innerHTML=`<div class="product-detail"><div class="detail-photo"><img src="${p.img}" alt="${p.name}"></div><div class="detail-copy"><p class="small-label">${p.cat}</p><h2>${p.name}</h2><div class="detail-price">${money(p.price)}</div><p>${p.desc}</p><p>Every Rango piece is handmade in small batches. Natural variations in flowers and resin are part of what makes your piece yours.</p><button class="dark-btn add-detail" onclick="addCart(${p.id});closeModal('productModal');openCart()">Add to bag ♡</button></div></div>`;openModal("productModal")}
-function toast(msg){let t=$("#toast");t.textContent=msg;t.classList.add("show");clearTimeout(window.tt);window.tt=setTimeout(()=>t.classList.remove("show"),2200)}
-
-$$(".filter").forEach(b=>b.addEventListener("click",()=>{$$(".filter").forEach(x=>x.classList.remove("active"));b.classList.add("active");cat=b.dataset.cat;render()}));
-$("#searchInput").addEventListener("input",render);$("#sortSelect").addEventListener("change",render);
-$("#cartBtn").addEventListener("click",openCart);$("#closeCart").addEventListener("click",closeCart);$("#backdrop").addEventListener("click",closeCart);
-$("#menuBtn").addEventListener("click",()=>$("#mobileMenu").classList.toggle("open"));
-$$(".mobile-menu a").forEach(a=>a.addEventListener("click",()=>$("#mobileMenu").classList.remove("open")));
-$$("[data-close]").forEach(b=>b.addEventListener("click",()=>closeModal(b.dataset.close)));
-$$(".modal").forEach(m=>m.addEventListener("click",e=>{if(e.target===m)m.classList.remove("open")}));
-$("#customBtn").addEventListener("click",()=>openModal("customModal"));
-$("#checkoutBtn").addEventListener("click",()=>{
- if(!cart.length){toast("Your bag is empty.");return}
- let total=0;$("#checkoutSummary").innerHTML=cart.map(i=>{let p=products.find(x=>x.id===i.id);total+=p.price*i.qty;return `<div class="summary-line"><span>${p.name} × ${i.qty}</span><strong>${money(p.price*i.qty)}</strong></div>`}).join("")+`<hr><div class="summary-line"><b>Total</b><b>${money(total)}</b></div>`;
- closeCart();openModal("checkoutModal")
-});
-$("#checkoutForm").addEventListener("submit",e=>{e.preventDefault();localStorage.setItem("rangoLastOrder2",JSON.stringify({customer:Object.fromEntries(new FormData(e.target)),items:cart,date:new Date().toISOString()}));cart=[];save();renderCart();e.target.reset();closeModal("checkoutModal");toast("Order received! ♡")});
-$("#customForm").addEventListener("submit",e=>{e.preventDefault();localStorage.setItem("rangoCustom2",JSON.stringify(Object.fromEntries(new FormData(e.target))));e.target.reset();closeModal("customModal");toast("Custom request saved ♡")});
-$("#newsletter").addEventListener("submit",e=>{e.preventDefault();localStorage.setItem("rangoEmail",$("#email").value);e.target.reset();toast("Welcome to Rango ♡")});
-document.addEventListener("keydown",e=>{if(e.key==="Escape"){closeCart();$$(".modal").forEach(m=>m.classList.remove("open"))}});
-render();renderCart();
+function renderCart(){if(!cart.length){$("#cartItems").innerHTML="";$("#emptyCart").style.display="block";$("#cartFooter").style.display="none";return}$("#emptyCart").style.display="none";$("#cartFooter").style.display="block";let total=0;$("#cartItems").innerHTML=cart.map(i=>{let p=products.find(x=>x.id===i.id);total+=p.price*i.qty;return `<div class="cart-row"><div class="cart-img"><img src="${p.img}" alt=""></div><div><h4>${p.name}</h4><small>${money(p.price)}</small><div class="controls"><button onclick="changeQty(${p.id},-1)">−</button><span>${i.qty}</span><button onclick="changeQty(${p.id},1)">+</button><button class="remove" onclick="removeItem(${p.id})">Remove</button></div></div><strong>${money(p.price*i.qty)}</strong></div>`}).join("");$("#subtotal").textContent=money(total);const pct=Math.min(total/3000*100,100);$("#freeBar").style.width=pct+"%";$("#freeText").textContent=total>=3000?"You unlocked free delivery ♡":`Rs. ${(3000-total).toLocaleString("en-PK")} away from free delivery`}
+function openCart(){renderCart();$("#drawer").classList.add("open");$("#backdrop").classList.add("open");document.body.classList.add("no-scroll")}
+function closeCart(){$("#drawer").classList.remove("open");$("#backdrop").classList.remove("open");document.body.classList.remove("no-scroll")}
+function openModal(id){$("#"+id).classList.add("open");document.body.classList.add("no-scroll")}
+function closeModal(id){$("#"+id).classList.remove("open");if(!$(".modal.open"))document.body.classList.remove("no-scroll")}
+function openProduct(id){let p=products.find(x=>x.id===id);current=p;$("#productDetail").innerHTML=`<div class="product-detail"><div class="detail-photo"><img src="${p.img}" alt="${p.name}"></div><div class="detail-copy"><p class="eyebrow"><span></span> ${p.cat}</p><h2>${p.name}</h2><div class="detail-price">${money(p.price)}</div><p>${p.desc}</p><p>Every Rango piece is handmade in small batches. Natural variations in flowers and resin are part of what makes your piece yours.</p><button class="dark-btn add-detail" onclick="addCart(${p.id});closeModal('productModal');openCart()">Add to bag <span>♡</span></button></div></div>`;openModal("productModal")}
+function toast(msg){let t=$("#toast");t.textContent=msg;t.classList.add("show");clearTimeout(window.tt);window.tt=setTimeout(()=>t.classList.remove("show"),2400)}
+function closeSearch(){$("#searchPanel").classList.remove("open")}
+$$('.filter').forEach(b=>b.addEventListener('click',()=>{$$('.filter').forEach(x=>x.classList.remove('active'));b.classList.add('active');cat=b.dataset.cat;render()}));
+$("#searchInput").addEventListener("input",render);$("#sortSelect").addEventListener("change",render);$("#cartBtn").addEventListener("click",openCart);$("#closeCart").addEventListener("click",closeCart);$("#backdrop").addEventListener("click",closeCart);$("#menuBtn").addEventListener("click",()=>$("#mobileMenu").classList.toggle("open"));$$('.mobile-menu a').forEach(a=>a.addEventListener('click',()=>$("#mobileMenu").classList.remove('open')));
+$("#searchToggle").addEventListener("click",()=>{$("#searchPanel").classList.toggle("open");$("#searchInput").focus()});$("#closeSearch").addEventListener("click",closeSearch);$$('[data-close]').forEach(b=>b.addEventListener('click',()=>closeModal(b.dataset.close)));$$('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)closeModal(m.id)}));$("#customBtn").addEventListener("click",()=>openModal("customModal"));
+$("#checkoutBtn").addEventListener("click",()=>{if(!cart.length){toast("Your bag is empty.");return}let total=0;$("#checkoutSummary").innerHTML=cart.map(i=>{let p=products.find(x=>x.id===i.id);total+=p.price*i.qty;return `<div class="summary-line"><span>${p.name} × ${i.qty}</span><strong>${money(p.price*i.qty)}</strong></div>`}).join("")+`<hr><div class="summary-line"><b>Total</b><b>${money(total)}</b></div>`;closeCart();openModal("checkoutModal")});
+$("#checkoutForm").addEventListener("submit",async e=>{e.preventDefault();const customer=Object.fromEntries(new FormData(e.target)),items=cart.slice();const result=await api('order',{customer,items});localStorage.setItem("rangoLastOrder2",JSON.stringify({customer,items,date:new Date().toISOString()}));cart=[];save();renderCart();e.target.reset();closeModal("checkoutModal");toast(result?.message||"Order received! ♡")});
+$("#customForm").addEventListener("submit",async e=>{e.preventDefault();const data=Object.fromEntries(new FormData(e.target));const result=await api('custom',data);localStorage.setItem("rangoCustom2",JSON.stringify(data));e.target.reset();closeModal("customModal");toast(result?.message||"Custom request saved ♡")});
+$("#newsletter").addEventListener("submit",async e=>{e.preventDefault();const email=$("#email").value;const result=await api('newsletter',{email});localStorage.setItem("rangoEmail",email);e.target.reset();toast(result?.message||"Welcome to Rango ♡")});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeCart();closeSearch();$$('.modal').forEach(m=>m.classList.remove('open'));document.body.classList.remove('no-scroll')}});
+const observer=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');observer.unobserve(e.target)}}),{threshold:.12});$$('.section-reveal').forEach(x=>observer.observe(x));
+window.addEventListener('scroll',()=>{$("#siteHeader").classList.toggle('scrolled',scrollY>20);$("#backTop").classList.toggle('show',scrollY>700)});$("#backTop").addEventListener('click',()=>scrollTo({top:0,behavior:'smooth'}));
+const hero=document.querySelector('.hero');hero?.addEventListener('pointermove',e=>{const r=hero.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;document.querySelector('.hero-main')?.style.setProperty('transform',`perspective(900px) rotateY(${x*4}deg) rotateX(${y*-4}deg)`);document.querySelector('.hero-small')?.style.setProperty('transform',`translate(${x*-12}px,${y*-12}px) rotate(-5deg)`)});hero?.addEventListener('pointerleave',()=>{document.querySelector('.hero-main')?.style.setProperty('transform','');document.querySelector('.hero-small')?.style.setProperty('transform','rotate(-5deg)')});
+$$('.magnetic').forEach(el=>el.addEventListener('pointermove',e=>{if(matchMedia('(pointer:fine)').matches){const r=el.getBoundingClientRect();el.style.transform=`translate(${(e.clientX-r.left-r.width/2)*.12}px,${(e.clientY-r.top-r.height/2)*.12}px)`}}));$$('.magnetic').forEach(el=>el.addEventListener('pointerleave',()=>el.style.transform=''));
+window.addEventListener('load',()=>setTimeout(()=>$("#pageLoader").classList.add('done'),500));render();renderCart();
